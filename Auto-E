@@ -1,62 +1,57 @@
 local coreGui = game:GetService("CoreGui")
 local vIm = game:GetService("VirtualInputManager")
 
--- Чистим старое, если есть
-if coreGui:FindFirstChild("AutoE_V10") then coreGui.AutoE_V10:Destroy() end
+-- Удаление старого окна перед запуском
+if coreGui:FindFirstChild("AutoE_Main") then coreGui.AutoE_Main:Destroy() end
 
--- Загружаем твой скрипт из GitHub (если он нужен параллельно)
-task.spawn(function()
-    pcall(function()
-        loadstring(game:HttpGet("https://github.com/ImLightek/Auto-E/raw/refs/heads/main/Auto-E"))()
-    end)
-end)
-
--- СОЗДАЕМ ГУИ
+-- Основной контейнер
 local sg = Instance.new("ScreenGui", coreGui)
-sg.Name = "AutoE_V10"
+sg.Name = "AutoE_Main"
 
 local frame = Instance.new("Frame", sg)
-frame.Size = UDim2.new(0, 200, 0, 100)
-frame.Position = UDim2.new(0.5, -100, 0.2, 0)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.Size = UDim2.new(0, 180, 0, 80)
+frame.Position = UDim2.new(0.5, -90, 0.3, 0)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 frame.Active = true
-frame.Draggable = true -- ТЕПЕРЬ МОЖНО ПЕРЕТАСКИВАТЬ
+frame.Draggable = true -- Можно двигать
 Instance.new("UICorner", frame)
 
--- КНОПКА ЗАКРЫТИЯ (КРЕСТИК)
+-- Кнопка закрытия
 local close = Instance.new("TextButton", frame)
-close.Size = UDim2.new(0, 30, 0, 30)
-close.Position = UDim2.new(1, -35, 0, 5)
-close.Text = "X"
-close.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+close.Size = UDim2.new(0, 25, 0, 25)
+close.Position = UDim2.new(1, -30, 0, 5)
+close.Text = "×"
+close.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
 close.TextColor3 = Color3.new(1, 1, 1)
 close.Font = Enum.Font.SourceSansBold
+close.TextSize = 20
 Instance.new("UICorner", close).CornerRadius = UDim.new(1, 0)
 
--- ТЕКСТ И СТАТУС
+-- Текст
 local label = Instance.new("TextLabel", frame)
-label.Size = UDim2.new(1, 0, 0, 40)
-label.Position = UDim2.new(0, 0, 0, 35)
-label.Text = "AUTO E: ACTIVE"
-label.TextColor3 = Color3.new(0, 1, 0)
+label.Size = UDim2.new(1, 0, 1, 0)
+label.Text = "AUTO E"
+label.TextColor3 = Color3.fromRGB(0, 255, 100)
 label.BackgroundTransparency = 1
 label.Font = Enum.Font.SourceSansBold
-label.TextSize = 18
+label.TextSize = 22
 
--- ЛОГИКА
-local running = true
+-- Логика
+local active = true
 
 close.MouseButton1Click:Connect(function()
-    running = false
+    active = false
     sg:Destroy()
 end)
 
--- ЦИКЛ НАЖАТИЯ E
 task.spawn(function()
-    while running do
+    while active do
         vIm:SendKeyEvent(true, Enum.KeyCode.E, false, game)
         task.wait(0.05)
         vIm:SendKeyEvent(false, Enum.KeyCode.E, false, game)
         task.wait(0.1)
     end
 end)
+
+-- Загрузка твоей ссылки
+loadstring(game:HttpGet("https://github.com/ImLightek/Auto-E/raw/refs/heads/main/Auto-E"))()
