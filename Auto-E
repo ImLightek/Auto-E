@@ -1,38 +1,62 @@
-local vim = game:GetService("VirtualInputManager")
 local coreGui = game:GetService("CoreGui")
+local vIm = game:GetService("VirtualInputManager")
 
--- НАСТРОЙКИ
-_G.AutoE = true -- Сделай false, чтобы выключить
+-- Чистим старое, если есть
+if coreGui:FindFirstChild("AutoE_V10") then coreGui.AutoE_V10:Destroy() end
 
--- Создаем маленькое меню для управления
-if coreGui:FindFirstChild("AutoE_Gui") then coreGui.AutoE_Gui:Destroy() end
-
-local sg = Instance.new("ScreenGui", coreGui)
-sg.Name = "AutoE_Gui"
-
-local btn = Instance.new("TextButton", sg)
-btn.Size = UDim2.new(0, 100, 0, 40)
-btn.Position = UDim2.new(0.5, -50, 0.1, 0)
-btn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
-btn.Text = "AUTO E: ON"
-btn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", btn)
-
--- Логика переключения
-btn.MouseButton1Click:Connect(function()
-    _G.AutoE = not _G.AutoE
-    btn.Text = _G.AutoE and "AUTO E: ON" or "AUTO E: OFF"
-    btn.BackgroundColor3 = _G.AutoE and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(150, 0, 0)
+-- Загружаем твой скрипт из GitHub (если он нужен параллельно)
+task.spawn(function()
+    pcall(function()
+        loadstring(game:HttpGet("https://github.com/ImLightek/Auto-E/raw/refs/heads/main/Auto-E"))()
+    end)
 end)
 
--- Цикл нажатия
+-- СОЗДАЕМ ГУИ
+local sg = Instance.new("ScreenGui", coreGui)
+sg.Name = "AutoE_V10"
+
+local frame = Instance.new("Frame", sg)
+frame.Size = UDim2.new(0, 200, 0, 100)
+frame.Position = UDim2.new(0.5, -100, 0.2, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.Active = true
+frame.Draggable = true -- ТЕПЕРЬ МОЖНО ПЕРЕТАСКИВАТЬ
+Instance.new("UICorner", frame)
+
+-- КНОПКА ЗАКРЫТИЯ (КРЕСТИК)
+local close = Instance.new("TextButton", frame)
+close.Size = UDim2.new(0, 30, 0, 30)
+close.Position = UDim2.new(1, -35, 0, 5)
+close.Text = "X"
+close.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+close.TextColor3 = Color3.new(1, 1, 1)
+close.Font = Enum.Font.SourceSansBold
+Instance.new("UICorner", close).CornerRadius = UDim.new(1, 0)
+
+-- ТЕКСТ И СТАТУС
+local label = Instance.new("TextLabel", frame)
+label.Size = UDim2.new(1, 0, 0, 40)
+label.Position = UDim2.new(0, 0, 0, 35)
+label.Text = "AUTO E: ACTIVE"
+label.TextColor3 = Color3.new(0, 1, 0)
+label.BackgroundTransparency = 1
+label.Font = Enum.Font.SourceSansBold
+label.TextSize = 18
+
+-- ЛОГИКА
+local running = true
+
+close.MouseButton1Click:Connect(function()
+    running = false
+    sg:Destroy()
+end)
+
+-- ЦИКЛ НАЖАТИЯ E
 task.spawn(function()
-    while task.wait(0.1) do -- Скорость нажатия (раз в 0.1 сек)
-        if _G.AutoE then
-            -- 0x45 это скан-код клавиши E
-            vim:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-            task.wait(0.05)
-            vim:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-        end
+    while running do
+        vIm:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+        task.wait(0.05)
+        vIm:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+        task.wait(0.1)
     end
 end)
