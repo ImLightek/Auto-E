@@ -1,0 +1,38 @@
+local vim = game:GetService("VirtualInputManager")
+local coreGui = game:GetService("CoreGui")
+
+-- НАСТРОЙКИ
+_G.AutoE = true -- Сделай false, чтобы выключить
+
+-- Создаем маленькое меню для управления
+if coreGui:FindFirstChild("AutoE_Gui") then coreGui.AutoE_Gui:Destroy() end
+
+local sg = Instance.new("ScreenGui", coreGui)
+sg.Name = "AutoE_Gui"
+
+local btn = Instance.new("TextButton", sg)
+btn.Size = UDim2.new(0, 100, 0, 40)
+btn.Position = UDim2.new(0.5, -50, 0.1, 0)
+btn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+btn.Text = "AUTO E: ON"
+btn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", btn)
+
+-- Логика переключения
+btn.MouseButton1Click:Connect(function()
+    _G.AutoE = not _G.AutoE
+    btn.Text = _G.AutoE and "AUTO E: ON" or "AUTO E: OFF"
+    btn.BackgroundColor3 = _G.AutoE and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(150, 0, 0)
+end)
+
+-- Цикл нажатия
+task.spawn(function()
+    while task.wait(0.1) do -- Скорость нажатия (раз в 0.1 сек)
+        if _G.AutoE then
+            -- 0x45 это скан-код клавиши E
+            vim:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+            task.wait(0.05)
+            vim:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+        end
+    end
+end)
